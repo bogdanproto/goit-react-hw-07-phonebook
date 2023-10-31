@@ -5,7 +5,8 @@ import * as yup from 'yup';
 import { Form, Label } from './ContactForm.styled';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { addContact } from 'redux/contactsSlice';
+import { selectContacts } from 'redux/selectors';
+import { addContact } from 'redux/operations';
 
 const schema = yup.object({
   name: yup.string().required('Name is required').trim(),
@@ -28,11 +29,11 @@ export const ContactForm = () => {
     resolver: yupResolver(schema),
   });
 
-  const { contacts } = useSelector(state => state.contacts);
+  const items = useSelector(selectContacts);
   const dispatch = useDispatch();
 
   const onSubmit = data => {
-    const isContactExist = contacts.some(
+    const isContactExist = items.some(
       ({ name }) => name.toLowerCase() === data.name.toLowerCase()
     );
 

@@ -1,29 +1,32 @@
-import { createSlice, nanoid } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
+import { addContact, deleteContact, fetchContacts } from './operations';
+import {
+  handleError,
+  handleFulfilled,
+  handleFulfilledAdd,
+  handleFulfilledDelete,
+  handlePending,
+} from 'reduxFunctions/statusChangers';
 
 const contactsSlice = createSlice({
   name: 'contacts',
-  initialState: { contacts: [] },
-  reducers: {
-    addContact: {
-      reducer(state, action) {
-        return { contacts: [...state.contacts, action.payload] };
-      },
-      prepare(obj) {
-        return {
-          payload: {
-            ...obj,
-            id: nanoid(),
-          },
-        };
-      },
-    },
-    deleteContact(state, action) {
-      return {
-        contacts: state.contacts.filter(({ id }) => id !== action.payload),
-      };
-    },
+  initialState: {
+    items: [],
+    isLoading: false,
+    error: null,
+  },
+  extraReducers: builder => {
+    builder
+      .addCase(fetchContacts.pending, handlePending)
+      .addCase(fetchContacts.fulfilled, handleFulfilled)
+      .addCase(fetchContacts.rejected, handleError)
+      .addCase(addContact.pending, handlePending)
+      .addCase(addContact.fulfilled, handleFulfilledAdd)
+      .addCase(addContact.rejected, handleError)
+      .addCase(deleteContact.pending, handlePending)
+      .addCase(deleteContact.fulfilled, handleFulfilledDelete)
+      .addCase(deleteContact.rejected, handleError);
   },
 });
 
-export const { addContact, deleteContact } = contactsSlice.actions;
 export const contactsReducer = contactsSlice.reducer;
